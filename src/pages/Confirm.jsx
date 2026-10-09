@@ -30,8 +30,8 @@ export default function Confirm() {
     setSubmitting(true);
     setError('');
 
-    // Ensure booking and vehicle data exist
-    if (!booking || !booking.vehicle) {
+    // FIXED: Changed booking.vehicle to booking.selectedVehicle
+    if (!booking || !booking.selectedVehicle) {
       setError('No vehicle selected. Please choose a vehicle first.');
       setSubmitting(false);
       return;
@@ -40,10 +40,12 @@ export default function Confirm() {
     const { error: insertError } = await supabase.from('bookings').insert([
       {
         user_id: user.id,
-        vehicle_id: booking.vehicle.id,
+        // FIXED: Changed booking.vehicle to booking.selectedVehicle
+        vehicle_id: booking.selectedVehicle.id,
         pickup_date: booking.pickupDate || new Date().toISOString(),
         return_date: booking.returnDate || new Date().toISOString(),
-        total_price: booking.totalPrice || booking.vehicle.daily_rate,
+        // FIXED: Changed booking.vehicle to booking.selectedVehicle
+        total_price: booking.totalPrice || booking.selectedVehicle.daily_rate,
       }
     ]);
 
@@ -67,15 +69,16 @@ export default function Confirm() {
 
         {error && <p className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{error}</p>}
 
-        {booking && booking.vehicle ? (
+        {/* FIXED: Changed booking.vehicle to booking.selectedVehicle */}
+        {booking && booking.selectedVehicle ? (
           <div className="space-y-4 mb-6">
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium text-gray-600">Vehicle:</span>
-              <span className="font-bold text-slate-900">{booking.vehicle.name}</span>
+              <span className="font-bold text-slate-900">{booking.selectedVehicle.name}</span>
             </div>
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium text-gray-600">Daily Rate:</span>
-              <span className="text-slate-900">₹{booking.vehicle.daily_rate} / day</span>
+              <span className="text-slate-900">₹{booking.selectedVehicle.daily_rate} / day</span>
             </div>
             <div className="flex justify-between border-b pb-2">
               <span className="font-medium text-gray-600">Account Email:</span>
@@ -88,7 +91,8 @@ export default function Confirm() {
 
         <button 
           onClick={handleConfirmReservation} 
-          disabled={submitting || !booking?.vehicle}
+          // FIXED: Changed booking.vehicle to booking.selectedVehicle
+          disabled={submitting || !booking?.selectedVehicle}
           className="w-full bg-slate-900 text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
         >
           {submitting ? 'Processing...' : 'Complete Reservation'}
